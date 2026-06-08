@@ -1,0 +1,66 @@
+@model TechMove.GLMS.Models.Contract
+
+@{
+    ViewData["Title"] = "New Contract";
+}
+
+<h2>New Contract</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="ClientId" class="form-label">Client</label>
+                <select asp-for="ClientId" asp-items="@(ViewBag.ClientList as SelectList)" class="form-select">
+                    <option value="">-- Select Client --</option>
+                </select>
+                <span asp-validation-for="ClientId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="StartDate" class="form-label"></label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EndDate" class="form-label"></label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+                <span asp-validation-for="EndDate" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Status" class="form-label"></label>
+                <select asp-for="Status" class="form-select"
+                        asp-items="Html.GetEnumSelectList<TechMove.GLMS.Models.ContractStatus>()">
+                </select>
+                <span asp-validation-for="Status" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ServiceLevel" class="form-label"></label>
+                <input asp-for="ServiceLevel" class="form-control" />
+                <span asp-validation-for="ServiceLevel" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="SignedAgreement">Signed Agreement (PDF, max 10 MB)</label>
+                <input type="file" id="SignedAgreement" name="SignedAgreement" accept=".pdf" class="form-control" />
+                <span class="text-danger small">
+                    @Html.ValidationMessage("SignedAgreement")
+                </span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

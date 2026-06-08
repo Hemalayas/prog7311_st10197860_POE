@@ -1,0 +1,29 @@
+@model TechMove.GLMS.Models.Client
+
+@{
+    ViewData["Title"] = $"Client: {Model.Name}";
+}
+
+<h2>@Model.Name</h2>
+
+<div class="card mb-4" style="max-width: 480px;">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Region</dt>
+            <dd class="col-sm-8">@(Model.Region ?? "—")</dd>
+
+            <dt class="col-sm-4">Contact</dt>
+            <dd class="col-sm-8">@(Model.ContactDetails ?? "—")</dd>
+
+            <dt class="col-sm-4">Contracts</dt>
+            <dd class="col-sm-8">@Model.Contracts.Count</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="d-flex gap-2 mb-4">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Edit</a>
+    <a asp-controller="Contracts" asp-action="Index" class="btn btn-outline-primary">View Contracts</a>
+</div>
+
+<a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>

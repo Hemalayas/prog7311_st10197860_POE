@@ -1,0 +1,119 @@
+@model TechMove.GLMS.ViewModels.CreateServiceRequestViewModel
+
+@{
+    var contract = ViewBag.Contract as TechMove.GLMS.Models.Contract;
+    ViewData["Title"] = "New Service Request";
+}
+
+<h2>New Service Request</h2>
+
+@if (contract is not null)
+{
+    <p class="text-muted mb-4">
+        Contract #@contract.Id &mdash; @contract.Client?.Name
+        <span class="badge ms-2 @(contract.Status == TechMove.GLMS.Models.ContractStatus.Active ? "bg-success" :
+                                    contract.Status == TechMove.GLMS.Models.ContractStatus.Expired ? "bg-danger" :
+                                    contract.Status == TechMove.GLMS.Models.ContractStatus.OnHold ? "bg-secondary" :
+                                    "bg-warning text-dark")">
+            @contract.Status
+        </span>
+    </p>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            @* All shows both model-level and property-level errors in one place *@
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <input type="hidden" asp-for="ContractId" />
+
+            <div class="mb-3">
+                <label asp-for="Type" class="form-label">Service Type</label>
+                <select asp-for="Type" class="form-select">
+                    <option value="">— Select —</option>
+                    <option value="Freight">Freight</option>
+                    <option value="Customs">Customs</option>
+                    <option value="Warehouse">Warehouse</option>
+                </select>
+                <span asp-validation-for="Type" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Cost" class="form-label"></label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input asp-for="Cost" id="costUsd" class="form-control" type="number"
+                           step="0.01" min="0.01" placeholder="0.00" />
+                </div>
+                <span asp-validation-for="Cost" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Cost (ZAR)</label>
+                <div class="input-group">
+                    <span class="input-group-text">R</span>
+                    <input id="costZarDisplay" class="form-control" type="text" readonly
+                           placeholder="Enter USD amount above" />
+                </div>
+                <small id="zarRateHint" class="text-muted"></small>
+                <input asp-for="CostZAR" id="costZarHidden" type="hidden" />
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Create</button>
+                @if (contract is not null)
+                {
+                    <a asp-controller="Contracts" asp-action="Details" asp-route-id="@contract.Id"
+                       class="btn btn-outline-secondary">Cancel</a>
+                }
+                else
+                {
+                    <a asp-controller="Contracts" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script>
+        (async function () {
+            let zarRate = 18.5;
+
+            try {
+                const res = await fetch('@Url.Action("GetZarRate", "ServiceRequests")');
+                if (res.ok) {
+                    const data = await res.json();
+                    zarRate = data.rate;
+                }
+            } catch { /* use fallback */ }
+
+            document.getElementById('zarRateHint').textContent =
+                `Exchange rate: 1 USD = ${zarRate.toFixed(4)} ZAR`;
+
+            function recalculate() {
+                const usd = parseFloat(document.getElementById('costUsd').value);
+                if (!isNaN(usd) && usd > 0) {
+                    const zar = (usd * zarRate).toFixed(2);
+                    document.getElementById('costZarDisplay').value = zar;
+                    document.getElementById('costZarHidden').value = zar;
+                } else {
+                    document.getElementById('costZarDisplay').value = '';
+                    document.getElementById('costZarHidden').value = '0';
+                }
+            }
+
+            document.getElementById('costUsd').addEventListener('input', recalculate);
+            recalculate();
+        })();
+    </script>
+}

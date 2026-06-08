@@ -1,0 +1,76 @@
+@model TechMove.GLMS.Models.Contract
+
+@{
+    ViewData["Title"] = $"Edit Contract #{Model.Id}";
+}
+
+<h2>Edit Contract #@Model.Id</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" asp-route-id="@Model.Id" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="SignedAgreementPath" />
+
+            <div class="mb-3">
+                <label asp-for="ClientId" class="form-label"></label>
+                <input asp-for="ClientId" class="form-control" />
+                <span asp-validation-for="ClientId" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="StartDate" class="form-label"></label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EndDate" class="form-label"></label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+                <span asp-validation-for="EndDate" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Status" class="form-label"></label>
+                <select asp-for="Status" class="form-select"
+                        asp-items="Html.GetEnumSelectList<TechMove.GLMS.Models.ContractStatus>()">
+                </select>
+                <span asp-validation-for="Status" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ServiceLevel" class="form-label"></label>
+                <input asp-for="ServiceLevel" class="form-control" />
+                <span asp-validation-for="ServiceLevel" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="SignedAgreement">
+                    Signed Agreement (PDF, max 10 MB)
+                </label>
+                @if (!string.IsNullOrEmpty(Model.SignedAgreementPath))
+                {
+                    <p class="mb-1 small text-muted">
+                        Current file:
+                        <a href="@Model.SignedAgreementPath" target="_blank">Download</a>
+                        — upload a new file to replace it.
+                    </p>
+                }
+                <input type="file" id="SignedAgreement" name="SignedAgreement" accept=".pdf" class="form-control" />
+                <span class="text-danger small">
+                    @Html.ValidationMessage("SignedAgreement")
+                </span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

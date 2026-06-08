@@ -1,0 +1,20 @@
+# Stage 1: build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy solution and project file first so NuGet restore is cached as a separate layer
+COPY TechMove.GLMS.sln ./
+COPY TechMove.GLMS/TechMove.GLMS.csproj ./TechMove.GLMS/
+RUN dotnet restore TechMove.GLMS/TechMove.GLMS.csproj
+
+# Copy the rest of the source and publish
+COPY TechMove.GLMS/ ./TechMove.GLMS/
+RUN dotnet publish TechMove.GLMS/TechMove.GLMS.csproj -c Release --no-restore -o /app/publish
+
+# Stage 2: runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+EXPOSE 5000
+ENTRYPOINT ["dotnet", "TechMove.GLMS.dll"]

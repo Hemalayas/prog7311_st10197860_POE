@@ -1,0 +1,57 @@
+@model IEnumerable<TechMove.GLMS.Models.ServiceRequest>
+
+@{
+    ViewData["Title"] = "Service Requests";
+}
+
+<h2>Service Requests</h2>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No service requests found. Create one from a contract's detail page.</p>
+}
+else
+{
+    <div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Contract</th>
+                <th>Client</th>
+                <th>Service Level</th>
+                <th>Cost (USD)</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sr in Model)
+            {
+                <tr>
+                    <td>@sr.Id</td>
+                    <td>
+                        <a asp-controller="Contracts" asp-action="Details" asp-route-id="@sr.ContractId">
+                            Contract #@sr.ContractId
+                        </a>
+                    </td>
+                    <td>@sr.Contract?.Client?.Name</td>
+                    <td>@sr.ServiceLevel</td>
+                    <td>@sr.Cost.ToString("C")</td>
+                    <td>
+                        <span class="badge @(sr.Status == TechMove.GLMS.Models.ServiceRequestStatus.Approved ? "bg-success" :
+                                              sr.Status == TechMove.GLMS.Models.ServiceRequestStatus.Rejected ? "bg-danger" :
+                                              "bg-secondary")">
+                            @sr.Status
+                        </span>
+                    </td>
+                    <td>
+                        <a asp-controller="Contracts" asp-action="Details" asp-route-id="@sr.ContractId"
+                           class="btn btn-sm btn-outline-primary">View Contract</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </div>
+}

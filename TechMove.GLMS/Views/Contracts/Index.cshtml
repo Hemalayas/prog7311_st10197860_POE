@@ -1,0 +1,60 @@
+@model IEnumerable<TechMove.GLMS.Models.Contract>
+
+@{
+    ViewData["Title"] = "Contracts";
+}
+
+<h2>Contracts</h2>
+
+<div class="mb-3 d-flex gap-2">
+    <a asp-action="Create" class="btn btn-primary">New Contract</a>
+    <a asp-action="Search" class="btn btn-outline-secondary">Search</a>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No contracts found.</p>
+}
+else
+{
+    <div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Service Level</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contract in Model)
+            {
+                <tr>
+                    <td>@contract.Id</td>
+                    <td>@contract.Client?.Name</td>
+                    <td>@contract.StartDate.ToString("yyyy-MM-dd")</td>
+                    <td>@contract.EndDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <span class="badge @(contract.Status == TechMove.GLMS.Models.ContractStatus.Active ? "bg-success" :
+                                              contract.Status == TechMove.GLMS.Models.ContractStatus.Expired ? "bg-danger" :
+                                              contract.Status == TechMove.GLMS.Models.ContractStatus.OnHold ? "bg-secondary" :
+                                              "bg-warning text-dark")">
+                            @contract.Status
+                        </span>
+                    </td>
+                    <td>@contract.ServiceLevel</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@contract.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                        <a asp-action="Edit" asp-route-id="@contract.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@contract.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    </div>
+}
